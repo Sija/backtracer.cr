@@ -77,5 +77,26 @@ module Backtracer
         {pre_context, context_line, post_context}
       end
     end
+
+    def context_hash(context_lines : Int32? = nil) : Hash(Int32, String)?
+      return unless context = self.context(context_lines)
+      return unless lineno = self.number
+
+      pre_context, context_line, post_context = context
+
+      ({} of Int32 => String).tap do |hash|
+        pre_context.each_with_index do |code, index|
+          line = (lineno - pre_context.size) + index
+          hash[line] = code
+        end
+
+        hash[lineno] = context_line
+
+        post_context.each_with_index do |code, index|
+          line = lineno + (index + 1)
+          hash[line] = code
+        end
+      end
+    end
   end
 end
