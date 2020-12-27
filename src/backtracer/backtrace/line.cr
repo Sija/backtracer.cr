@@ -51,6 +51,14 @@ module Backtracer
       end
     end
 
+    def absolute_path : String?
+      return unless path = file
+      return path if path.starts_with?('/')
+      if prefix = configuration.src_path
+        File.join(prefix, path)
+      end
+    end
+
     def shard_name : String?
       relative_path
         .try(&.match(configuration.modules_path_pattern))
