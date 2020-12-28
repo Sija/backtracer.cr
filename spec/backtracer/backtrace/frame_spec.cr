@@ -43,7 +43,7 @@ describe Backtracer::Backtrace::Frame do
           frame.lineno.should be_nil
           frame.column.should be_nil
           frame.method.should eq(backtrace_line)
-          frame.file.should be_nil
+          frame.path.should be_nil
           frame.relative_path.should be_nil
           frame.under_src_path?.should be_false
           frame.shard_name.should be_nil
@@ -60,7 +60,7 @@ describe Backtracer::Backtrace::Frame do
           frame.lineno.should eq(72)
           frame.column.should be_nil
           frame.method.should eq("~proc2Proc(Fiber, (IO::FileDescriptor | Nil))")
-          frame.file.should eq("/usr/local/Cellar/crystal/0.27.2/src/fiber.cr")
+          frame.path.should eq("/usr/local/Cellar/crystal/0.27.2/src/fiber.cr")
           frame.relative_path.should be_nil
           frame.under_src_path?.should be_false
           frame.shard_name.should be_nil
@@ -75,7 +75,7 @@ describe Backtracer::Backtrace::Frame do
           frame.lineno.should eq(11)
           frame.column.should be_nil
           frame.method.should eq("~procProc(HTTP::Server::Context, String)")
-          frame.file.should eq("lib/kemal/src/kemal/route.cr")
+          frame.path.should eq("lib/kemal/src/kemal/route.cr")
           frame.relative_path.should eq("lib/kemal/src/kemal/route.cr")
           frame.under_src_path?.should be_false
           frame.shard_name.should eq("kemal")
@@ -91,7 +91,7 @@ describe Backtracer::Backtrace::Frame do
         frame.lineno.should eq(1)
         frame.column.should eq(7)
         frame.method.should eq("foo_bar?")
-        frame.file.should eq(path)
+        frame.path.should eq(path)
         frame.relative_path.should be_nil
         frame.under_src_path?.should be_false
         frame.shard_name.should be_nil
@@ -105,7 +105,7 @@ describe Backtracer::Backtrace::Frame do
           frame.lineno.should eq(1)
           frame.column.should eq(7)
           frame.method.should eq("foo_bar?")
-          frame.file.should eq("#{__DIR__}/foo.cr")
+          frame.path.should eq("#{__DIR__}/foo.cr")
           frame.relative_path.should eq("spec/backtracer/backtrace/foo.cr")
           frame.under_src_path?.should be_true
           frame.shard_name.should be_nil
@@ -120,7 +120,7 @@ describe Backtracer::Backtrace::Frame do
           frame.lineno.should eq(1)
           frame.column.should eq(7)
           frame.method.should eq("foo_bar?")
-          frame.file.should eq(path)
+          frame.path.should eq(path)
           frame.relative_path.should eq(path)
           frame.under_src_path?.should be_false
           frame.shard_name.should be_nil
@@ -138,7 +138,7 @@ describe Backtracer::Backtrace::Frame do
           frame.lineno.should eq(1)
           frame.column.should eq(7)
           frame.method.should eq("foo_bar?")
-          frame.file.should eq(path)
+          frame.path.should eq(path)
           frame.relative_path.should eq("src/foo.cr")
           frame.under_src_path?.should be_true
           frame.shard_name.should be_nil
@@ -153,7 +153,7 @@ describe Backtracer::Backtrace::Frame do
           frame.lineno.should eq(1)
           frame.column.should eq(7)
           frame.method.should eq("foo_bar?")
-          frame.file.should eq(path)
+          frame.path.should eq(path)
           frame.relative_path.should eq(path)
           frame.under_src_path?.should be_false
           frame.shard_name.should be_nil
@@ -171,7 +171,7 @@ describe Backtracer::Backtrace::Frame do
           frame.lineno.should eq(1)
           frame.column.should eq(7)
           frame.method.should eq("foo_bar?")
-          frame.file.should eq(path)
+          frame.path.should eq(path)
           frame.relative_path.should eq("lib/bar/src/bar.cr")
           frame.under_src_path?.should be_true
           frame.shard_name.should eq "bar"
@@ -186,7 +186,7 @@ describe Backtracer::Backtrace::Frame do
           frame.lineno.should eq(1)
           frame.column.should eq(7)
           frame.method.should eq("foo_bar?")
-          frame.file.should eq(path)
+          frame.path.should eq(path)
           frame.relative_path.should eq(path)
           frame.under_src_path?.should be_false
           frame.shard_name.should eq "bar"

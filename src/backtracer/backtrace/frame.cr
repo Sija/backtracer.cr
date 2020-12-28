@@ -1,31 +1,31 @@
 module Backtracer
   # An object representation of a stack frame.
   struct Backtrace::Frame
-    # The method of the frame (such as `User.find`).
+    # The method of this frame (such as `User.find`).
     getter method : String
 
-    # The file portion of the frame (such as `app/models/user.cr`).
-    getter file : String?
+    # The file name of this frame (such as `app/models/user.cr`).
+    getter path : String?
 
-    # The line number portion of the frame.
+    # The line number of this frame.
     getter lineno : Int32?
 
-    # The column number portion of the frame.
+    # The column number of this frame.
     getter column : Int32?
 
     protected getter(configuration) { Backtracer.configuration }
 
-    def initialize(@method, @file = nil, @lineno = nil, @column = nil, *,
+    def initialize(@method, @path = nil, @lineno = nil, @column = nil, *,
                    @configuration = nil)
     end
 
-    def_equals_and_hash @method, @file, @lineno, @column
+    def_equals_and_hash @method, @path, @lineno, @column
 
     # Reconstructs the frame in a readable fashion
     def to_s(io : IO) : Nil
       io << '`' << @method << '`'
-      if @file
-        io << " at " << @file
+      if @path
+        io << " at " << @path
         io << ':' << @lineno if @lineno
         io << ':' << @column if @column
       end
@@ -39,11 +39,11 @@ module Backtracer
 
     def under_src_path? : Bool
       return false unless src_path = configuration.src_path
-      !!file.try(&.starts_with?(src_path))
+      !!path.try(&.starts_with?(src_path))
     end
 
     def relative_path : String?
-      return unless path = file
+      return unless path = @path
       return path unless path.starts_with?('/')
       return unless under_src_path?
       if prefix = configuration.src_path
@@ -52,7 +52,7 @@ module Backtracer
     end
 
     def absolute_path : String?
-      return unless path = file
+      return unless path = @path
       return path if path.starts_with?('/')
       if prefix = configuration.src_path
         File.join(prefix, path)
@@ -66,7 +66,7 @@ module Backtracer
     end
 
     def in_app? : Bool
-      !!(file.try(&.matches?(configuration.in_app_pattern)))
+      !!(path.try(&.matches?(configuration.in_app_pattern)))
     end
 
     def context(context_lines : Int32? = nil) : {Array(String), String, Array(String)}?
@@ -74,9 +74,9 @@ module Backtracer
 
       return unless context_lines && (context_lines > 0)
       return unless (lineno = @lineno) && (lineno > 0)
-      return unless (filename = @file) && File.readable?(filename)
+      return unless (path = @path) && File.readable?(path)
 
-      lines = File.read_lines(filename)
+      lines = File.read_lines(path)
       lineidx = lineno - 1
 
       if context_line = lines[lineidx]?
@@ -88,7 +88,7 @@ module Backtracer
 
     def context_hash(context_lines : Int32? = nil) : Hash(Int32, String)?
       return unless context = self.context(context_lines)
-      return unless lineno = self.lineno
+      return unless lineno = @lineno
 
       pre_context, context_line, post_context = context
 
