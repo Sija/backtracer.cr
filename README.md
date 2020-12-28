@@ -1,6 +1,6 @@
-# backtracer.cr
+# backtracer.cr [![Build Status](https://travis-ci.com/Sija/backtracer.cr.svg?branch=master)](https://travis-ci.com/Sija/backtracer.cr) [![Releases](https://img.shields.io/github/release/Sija/backtracer.cr.svg)](https://github.com/Sija/backtracer.cr/releases) [![License](https://img.shields.io/github/license/Sija/backtracer.cr.svg)](https://github.com/Sija/backtracer.cr/blob/master/LICENSE)
 
-TODO: Write a description here
+Crystal shard aiming to assist with parsing backtraces into a structured form.
 
 ## Installation
 
@@ -18,13 +18,35 @@ TODO: Write a description here
 
 ```crystal
 require "backtracer"
+
+def foo
+  raise "bang!"
+end
+
+def bar
+  foo
+end
+
+def baz
+  bar
+end
+
+begin
+  baz
+rescue ex
+  backtrace = Backtracer.parse(ex.backtrace)
+
+  # Prints
+  #
+  # `foo` at foo.cr:4:3
+  # `bar` at foo.cr:8:3
+  # `baz` at foo.cr:12:3
+  # ...
+  backtrace.frames.each do |frame|
+    puts frame
+  end
+end
 ```
-
-TODO: Write usage instructions here
-
-## Development
-
-TODO: Write development instructions here
 
 ## Contributing
 
