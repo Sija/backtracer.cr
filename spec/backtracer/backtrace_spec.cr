@@ -3,8 +3,8 @@ require "../spec_helper"
 describe Backtracer::Backtrace do
   backtrace = Backtracer.parse(caller)
 
-  it "#lines" do
-    backtrace.lines.should be_a(Array(Backtracer::Backtrace::Line))
+  it "#frames" do
+    backtrace.frames.should be_a(Array(Backtracer::Backtrace::Frame))
   end
 
   it "#inspect" do
@@ -18,7 +18,7 @@ describe Backtracer::Backtrace do
   {% end %}
 
   it "#==" do
-    backtrace2 = Backtracer::Backtrace.new(backtrace.lines)
+    backtrace2 = Backtracer::Backtrace.new(backtrace.frames)
     backtrace2.should eq(backtrace)
   end
 end

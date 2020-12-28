@@ -11,13 +11,16 @@ module Backtracer
       end
 
       lines = backtrace.compact_map do |line|
-        line = filters.reduce(line) do |nested_line, filter|
+        filters.reduce(line) do |nested_line, filter|
           filter.call(nested_line) || break
         end
-        Line::Parser.parse(line, configuration: configuration) if line
       end
 
-      Backtrace.new(lines)
+      frames = lines.map do |line|
+        Frame::Parser.parse(line, configuration: configuration)
+      end
+
+      Backtrace.new(frames)
     end
 
     def parse(backtrace : String, **options) : Backtrace

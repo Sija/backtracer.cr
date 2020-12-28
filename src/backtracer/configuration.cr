@@ -61,7 +61,7 @@ module Backtracer
     # to set this to something like `/(src|engines)/`
     property app_dirs_pattern = /src/
 
-    # `Regex` pattern matched against `Backtrace::Line#file`.
+    # `Regex` pattern matched against `Backtrace::Frame#file`.
     property in_app_pattern : Regex { /^(#{src_path}\/)?(#{app_dirs_pattern})/ }
 
     # Path pattern matching directories to be recognized as your app modules.

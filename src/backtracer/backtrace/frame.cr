@@ -1,38 +1,38 @@
 module Backtracer
-  # Handles backtrace parsing line by line
-  struct Backtrace::Line
-    # The method of the line (such as `User.find`).
+  # An object representation of a stack frame.
+  struct Backtrace::Frame
+    # The method of the frame (such as `User.find`).
     getter method : String
 
-    # The file portion of the line (such as `app/models/user.cr`).
+    # The file portion of the frame (such as `app/models/user.cr`).
     getter file : String?
 
-    # The line number portion of the line.
-    getter number : Int32?
+    # The line number portion of the frame.
+    getter lineno : Int32?
 
-    # The column number portion of the line.
+    # The column number portion of the frame.
     getter column : Int32?
 
     protected getter(configuration) { Backtracer.configuration }
 
-    def initialize(@method, @file = nil, @number = nil, @column = nil, *,
+    def initialize(@method, @file = nil, @lineno = nil, @column = nil, *,
                    @configuration = nil)
     end
 
-    def_equals_and_hash @method, @file, @number, @column
+    def_equals_and_hash @method, @file, @lineno, @column
 
-    # Reconstructs the line in a readable fashion
+    # Reconstructs the frame in a readable fashion
     def to_s(io : IO) : Nil
       io << '`' << @method << '`'
       if @file
         io << " at " << @file
-        io << ':' << @number if @number
+        io << ':' << @lineno if @lineno
         io << ':' << @column if @column
       end
     end
 
     def inspect(io : IO) : Nil
-      io << "Backtrace::Line("
+      io << "Backtrace::Frame("
       to_s(io)
       io << ')'
     end
@@ -73,7 +73,7 @@ module Backtracer
       context_lines ||= configuration.context_lines
 
       return unless context_lines && (context_lines > 0)
-      return unless (lineno = @number) && (lineno > 0)
+      return unless (lineno = @lineno) && (lineno > 0)
       return unless (filename = @file) && File.readable?(filename)
 
       lines = File.read_lines(filename)
@@ -88,7 +88,7 @@ module Backtracer
 
     def context_hash(context_lines : Int32? = nil) : Hash(Int32, String)?
       return unless context = self.context(context_lines)
-      return unless lineno = self.number
+      return unless lineno = self.lineno
 
       pre_context, context_line, post_context = context
 

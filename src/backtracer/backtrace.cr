@@ -1,19 +1,19 @@
 module Backtracer
   class Backtrace
-    getter lines : Array(Line)
+    getter frames : Array(Frame)
 
-    def initialize(@lines = [] of Line)
+    def initialize(@frames = [] of Frame)
     end
 
-    def_equals_and_hash @lines
+    def_equals_and_hash @frames
 
     def to_s(io : IO) : Nil
-      @lines.join(io, '\n')
+      @frames.join(io, '\n')
     end
 
     def inspect(io : IO) : Nil
       io << "#<Backtrace: "
-      @lines.join(io, ", ", &.inspect(io))
+      @frames.join(io, ", ", &.inspect(io))
       io << '>'
     end
   end
