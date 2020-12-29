@@ -21,7 +21,7 @@ module Backtracer
 
     def_equals_and_hash @method, @path, @lineno, @column
 
-    # Reconstructs the frame in a readable fashion
+    # Reconstructs the frame in a readable fashion.
     def to_s(io : IO) : Nil
       io << '`' << @method << '`'
       if @path
@@ -37,11 +37,24 @@ module Backtracer
       io << ')'
     end
 
+    # Returns `true` if `path` of this frame is within
+    # the `configuration.src_path`, `false` otherwise.
+    #
+    # See `Configuration#src_path`
     def under_src_path? : Bool
       return false unless src_path = configuration.src_path
       !!path.try(&.starts_with?(src_path))
     end
 
+    # Returns:
+    #
+    # - `path` as is, unless it's absolute - i.e. starts with `/`
+    # - `path` relative to `configuration.src_path` when `under_src_path?` is `true`
+    # - `nil` otherwise
+    #
+    # NOTE: returned path is not required to be `under_src_path?` - see point no. 1
+    #
+    # See `Configuration#src_path`
     def relative_path : String?
       return unless path = @path
       return path unless path.starts_with?('/')
@@ -51,6 +64,13 @@ module Backtracer
       end
     end
 
+    # Returns:
+    #
+    # - `path` as is, if it's absolute - i.e. starts with `/`
+    # - `path` appended to `configuration.src_path`
+    # - `nil` otherwise
+    #
+    # See `Configuration#src_path`
     def absolute_path : String?
       return unless path = @path
       return path if path.starts_with?('/')
@@ -59,16 +79,31 @@ module Backtracer
       end
     end
 
+    # Returns name of the shard from which this frame originated.
+    #
+    # See `Configuration#modules_path_pattern`
     def shard_name : String?
       relative_path
         .try(&.match(configuration.modules_path_pattern))
         .try(&.["name"])
     end
 
+    # Returns `true` if this frame originated from the app source code,
+    # `false` otherwise.
+    #
+    # See `Configuration#in_app_pattern`
     def in_app? : Bool
       !!(path.try(&.matches?(configuration.in_app_pattern)))
     end
 
+    # Returns a tuple consisting of 3 elements - an array of context lines
+    # before the `lineno`, line at `lineno`, and an array of context lines
+    # after the `lineno`. In case of failure it returns `nil`.
+    #
+    # Amount of returned context lines is taken from the *context_lines*
+    # argument if given, or `configuration.context_lines` otherwise.
+    #
+    # See `Configuration#context_lines`
     def context(context_lines : Int32? = nil) : {Array(String), String, Array(String)}?
       context_lines ||= configuration.context_lines
 
@@ -86,6 +121,13 @@ module Backtracer
       end
     end
 
+    # Returns hash with context lines, where line numbers are keys and
+    # the lines itself are values. In case of failure it returns `nil`.
+    #
+    # Amount of returned context lines is taken from the *context_lines*
+    # argument if given, or `configuration.context_lines` otherwise.
+    #
+    # See `Configuration#context`, `Configuration#context_lines`
     def context_hash(context_lines : Int32? = nil) : Hash(Int32, String)?
       return unless context = self.context(context_lines)
       return unless lineno = @lineno

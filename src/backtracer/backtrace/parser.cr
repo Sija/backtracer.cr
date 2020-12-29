@@ -2,6 +2,14 @@ module Backtracer
   module Backtrace::Parser
     extend self
 
+    # Parses *backtrace* (possibly obtained as a return value
+    # from `caller` or `Exception#backtrace` methods).
+    #
+    # Accepts options:
+    # - `configuration`: `Configuration` object - uses `Backtracer.configuration` if `nil`
+    # - `filters`: additional line filters - see `Configuration#line_filters`
+    #
+    # Returns parsed `Backtrace` object or raises `ArgumentError` otherwise.
     def parse(backtrace : Array(String), **options) : Backtrace
       configuration = options[:configuration]? || Backtracer.configuration
 

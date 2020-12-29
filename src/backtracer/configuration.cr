@@ -54,23 +54,36 @@ module Backtracer
     }
 
     # Used in `#in_app_pattern`.
+    #
+    # See `Frame#under_src_path?`
     property src_path : String? = {{ Process::INITIAL_PWD }}
 
     # Directories to be recognized as part of your app. e.g. if you
     # have an `engines` dir at the root of your project, you may want
     # to set this to something like `/(src|engines)/`
+    #
+    # See `Frame#in_app?`
     property app_dirs_pattern = /src/
 
-    # `Regex` pattern matched against `Backtrace::Frame#file`.
+    # `Regex` pattern matched against `Backtrace::Frame#path`.
+    #
+    # See `Frame#in_app?`
     property in_app_pattern : Regex { /^(#{src_path}\/)?(#{app_dirs_pattern})/ }
 
     # Path pattern matching directories to be recognized as your app modules.
     # Defaults to standard Shards setup (`lib/shard-name/...`).
+    #
+    # See `Frame#shard_name`
     property modules_path_pattern = /^lib\/(?<name>[^\/]+)\/(?:.+)/
 
-    # Number of lines of code context to capture, or `nil` for none.
+    # Number of lines of code context to return by default, or `nil` for none.
+    #
+    # See `Frame#context`
     property context_lines : Int32? = 5
 
+    # Array of procs used for filtering backtrace lines before parsing.
+    # Each filter is expected to return a string, which is then passed
+    # onto the next filter, or ignored althoghether if `nil` is returned.
     getter(line_filters) {
       [
         ->(line : String) { line unless line.matches?(IGNORED_LINES_PATTERN) },
