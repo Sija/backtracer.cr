@@ -91,9 +91,9 @@ module Backtracer
     # Returns `true` if this frame originated from the app source code,
     # `false` otherwise.
     #
-    # See `Configuration#in_app_pattern`
+    # See `Configuration#app_dirs_pattern`
     def in_app? : Bool
-      !!(path.try(&.matches?(configuration.in_app_pattern)))
+      !!(relative_path.try(&.matches?(configuration.app_dirs_pattern)))
     end
 
     # Returns a tuple consisting of 3 elements - an array of context lines

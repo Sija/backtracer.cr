@@ -53,7 +53,7 @@ module Backtracer
       /^(?<method>.+?)$/,
     }
 
-    # Used in `#in_app_pattern`.
+    # Path considered as "root" of your project.
     #
     # See `Frame#under_src_path?`
     property src_path : String? = {{ Process::INITIAL_PWD }}
@@ -63,12 +63,7 @@ module Backtracer
     # to set this to something like `/(src|engines)/`
     #
     # See `Frame#in_app?`
-    property app_dirs_pattern = /src/
-
-    # `Regex` pattern matched against `Backtrace::Frame#path`.
-    #
-    # See `Frame#in_app?`
-    property in_app_pattern : Regex { /^(#{src_path}\/)?(#{app_dirs_pattern})/ }
+    property app_dirs_pattern = /^src\//
 
     # Path pattern matching directories to be recognized as your app modules.
     # Defaults to standard Shards setup (`lib/shard-name/...`).
