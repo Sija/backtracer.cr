@@ -14,11 +14,13 @@ describe Backtracer::Backtrace do
     end
   end
 
-  it "#to_s" do
-    with_backtrace(caller) do |backtrace|
-      backtrace.to_s.should match(/backtrace_spec.cr/)
+  {% unless flag?(:release) || !flag?(:debug) %}
+    it "#to_s" do
+      with_backtrace(caller) do |backtrace|
+        backtrace.to_s.should match(/backtrace_spec.cr/)
+      end
     end
-  end
+  {% end %}
 
   it "#==" do
     with_backtrace(caller) do |backtrace|
