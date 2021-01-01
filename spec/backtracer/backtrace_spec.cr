@@ -1,24 +1,29 @@
 require "../spec_helper"
 
 describe Backtracer::Backtrace do
-  backtrace = Backtracer.parse(caller)
-
   it "#frames" do
-    backtrace.frames.should be_a(Array(Backtracer::Backtrace::Frame))
+    with_backtrace(caller) do |backtrace|
+      backtrace.frames.should be_a(Array(Backtracer::Backtrace::Frame))
+      backtrace.frames.should_not be_empty
+    end
   end
 
   it "#inspect" do
-    backtrace.inspect.should match(/#<Backtrace: .*>$/)
+    with_backtrace(caller) do |backtrace|
+      backtrace.inspect.should match(/#<Backtrace: .+>$/)
+    end
   end
 
-  {% unless flag?(:release) || !flag?(:debug) %}
-    it "#to_s" do
-      backtrace.to_s.should match(/backtrace_spec.cr:4/)
+  it "#to_s" do
+    with_backtrace(caller) do |backtrace|
+      backtrace.to_s.should match(/backtrace_spec.cr/)
     end
-  {% end %}
+  end
 
   it "#==" do
-    backtrace2 = Backtracer::Backtrace.new(backtrace.frames)
-    backtrace2.should eq(backtrace)
+    with_backtrace(caller) do |backtrace|
+      backtrace2 = Backtracer::Backtrace.new(backtrace.frames)
+      backtrace2.should eq(backtrace)
+    end
   end
 end
