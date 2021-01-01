@@ -60,7 +60,7 @@ module Backtracer
 
     # Directories to be recognized as part of your app. e.g. if you
     # have an `engines` dir at the root of your project, you may want
-    # to set this to something like `/(src|engines)/`
+    # to set this to something like `/^(src|engines)\//`
     #
     # See `Frame#in_app?`
     property app_dirs_pattern = /^src\//

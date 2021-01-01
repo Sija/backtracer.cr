@@ -23,7 +23,7 @@ module Backtracer
         configuration: options[:configuration]?
     end
 
-    # Same as `parse` but raises `ArgumentError` on error.
+    # Same as `parse?` but raises `ArgumentError` on error.
     def parse(line : String, **options) : Backtrace::Frame
       parse?(line, **options) ||
         raise ArgumentError.new("Error parsing line: #{line.inspect}")
