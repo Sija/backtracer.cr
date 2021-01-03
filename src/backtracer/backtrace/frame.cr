@@ -1,6 +1,8 @@
 module Backtracer
   # An object representation of a stack frame.
   struct Backtrace::Frame
+    @context_cache = {} of Int32 => Context
+
     # The method of this frame (such as `User.find`).
     getter method : String
 
@@ -109,8 +111,11 @@ module Backtracer
     # See `Configuration#context_lines`
     def context(context_lines : Int32? = nil) : Context?
       context_lines ||= configuration.context_lines
-
       return unless context_lines && (context_lines > 0)
+
+      cached = @context_cache[context_lines]?
+      return cached if cached
+
       return unless (lineno = @lineno) && (lineno > 0)
       return unless (path = @path) && File.readable?(path)
 
@@ -121,12 +126,13 @@ module Backtracer
         pre_context = lines[Math.max(0, lineidx - context_lines), context_lines]
         post_context = lines[Math.min(lines.size, lineidx + 1), context_lines]
 
-        Context.new(
-          lineno: lineno,
-          pre: pre_context,
-          line: context_line,
-          post: post_context,
-        )
+        @context_cache[context_lines] =
+          Context.new(
+            lineno: lineno,
+            pre: pre_context,
+            line: context_line,
+            post: post_context,
+          )
       end
     end
   end
