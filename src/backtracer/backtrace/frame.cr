@@ -96,15 +96,18 @@ module Backtracer
       !!(relative_path.try(&.matches?(configuration.app_dirs_pattern)))
     end
 
-    # Returns a tuple consisting of 3 elements - an array of context lines
+    # Returns `Context` record consisting of 3 elements - an array of context lines
     # before the `lineno`, line at `lineno`, and an array of context lines
     # after the `lineno`. In case of failure it returns `nil`.
     #
     # Amount of returned context lines is taken from the *context_lines*
     # argument if given, or `configuration.context_lines` otherwise.
     #
+    # NOTE: amount of returned context lines might be lower than given
+    # in cases where `lineno` is near the start or the end of the file.
+    #
     # See `Configuration#context_lines`
-    def context(context_lines : Int32? = nil) : {Array(String), String, Array(String)}?
+    def context(context_lines : Int32? = nil) : Context?
       context_lines ||= configuration.context_lines
 
       return unless context_lines && (context_lines > 0)
@@ -117,35 +120,13 @@ module Backtracer
       if context_line = lines[lineidx]?
         pre_context = lines[Math.max(0, lineidx - context_lines), context_lines]
         post_context = lines[Math.min(lines.size, lineidx + 1), context_lines]
-        {pre_context, context_line, post_context}
-      end
-    end
 
-    # Returns hash with context lines, where line numbers are keys and
-    # the lines itself are values. In case of failure it returns `nil`.
-    #
-    # Amount of returned context lines is taken from the *context_lines*
-    # argument if given, or `configuration.context_lines` otherwise.
-    #
-    # See `Configuration#context`, `Configuration#context_lines`
-    def context_hash(context_lines : Int32? = nil) : Hash(Int32, String)?
-      return unless context = self.context(context_lines)
-      return unless lineno = @lineno
-
-      pre_context, context_line, post_context = context
-
-      ({} of Int32 => String).tap do |hash|
-        pre_context.each_with_index do |code, index|
-          line = (lineno - pre_context.size) + index
-          hash[line] = code
-        end
-
-        hash[lineno] = context_line
-
-        post_context.each_with_index do |code, index|
-          line = lineno + (index + 1)
-          hash[line] = code
-        end
+        Context.new(
+          lineno: lineno,
+          pre: pre_context,
+          line: context_line,
+          post: post_context,
+        )
       end
     end
   end
