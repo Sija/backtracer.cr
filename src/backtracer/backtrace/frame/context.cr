@@ -15,6 +15,16 @@ module Backtracer
     def initialize(@lineno, @pre, @line, @post)
     end
 
+    # Returns an array composed of context lines from `pre`,
+    # `line` and `post`.
+    def to_a : Array(String)
+      ([] of String).tap do |ary|
+        ary.concat(pre)
+        ary << line
+        ary.concat(post)
+      end
+    end
+
     # Returns hash with context lines, where line numbers are
     # the keys and the lines itself are the values.
     def to_h : Hash(Int32, String)
