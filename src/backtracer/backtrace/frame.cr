@@ -123,8 +123,11 @@ module Backtracer
       lineidx = lineno - 1
 
       if context_line = lines[lineidx]?
-        pre_context = lines[Math.max(0, lineidx - context_lines), context_lines]
-        post_context = lines[Math.min(lines.size, lineidx + 1), context_lines]
+        pre_context_lines =
+          (lineno <= context_lines) ? lineidx : context_lines
+
+        pre_context = lines[(lineidx - context_lines).clamp(0..), pre_context_lines]
+        post_context = lines[(lineidx + 1).clamp(..lines.size), context_lines]
 
         @context_cache[context_lines] =
           Context.new(
