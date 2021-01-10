@@ -119,16 +119,22 @@ module Backtracer
       return unless (lineno = @lineno) && (lineno > 0)
       return unless (path = @path) && File.readable?(path)
 
-      lines = File.read_lines(path)
-      lineidx = lineno - 1
+      context_line = nil
+      pre_context, post_context = %w[], %w[]
 
-      if context_line = lines[lineidx]?
-        pre_context_lines =
-          (lineno <= context_lines) ? lineidx : context_lines
+      i = 0
+      File.each_line(path) do |line|
+        case i += 1
+        when lineno - context_lines...lineno
+          pre_context << line
+        when lineno
+          context_line = line
+        when lineno + 1..lineno + context_lines
+          post_context << line
+        end
+      end
 
-        pre_context = lines[(lineidx - context_lines).clamp(0..), pre_context_lines]
-        post_context = lines[(lineidx + 1).clamp(..lines.size), context_lines]
-
+      if context_line
         @context_cache[context_lines] =
           Context.new(
             lineno: lineno,
