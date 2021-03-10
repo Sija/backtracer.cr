@@ -1,4 +1,4 @@
-# backtracer.cr [![Build Status](https://travis-ci.com/Sija/backtracer.cr.svg?branch=master)](https://travis-ci.com/Sija/backtracer.cr) [![Releases](https://img.shields.io/github/release/Sija/backtracer.cr.svg)](https://github.com/Sija/backtracer.cr/releases) [![License](https://img.shields.io/github/license/Sija/backtracer.cr.svg)](https://github.com/Sija/backtracer.cr/blob/master/LICENSE)
+# backtracer.cr [![CI](https://github.com/Sija/backtracer.cr/actions/workflows/ci.yml/badge.svg)](https://github.com/Sija/backtracer.cr/actions/workflows/ci.yml) [![Releases](https://img.shields.io/github/release/Sija/backtracer.cr.svg)](https://github.com/Sija/backtracer.cr/releases) [![License](https://img.shields.io/github/license/Sija/backtracer.cr.svg)](https://github.com/Sija/backtracer.cr/blob/master/LICENSE)
 
 Crystal shard aiming to assist with parsing backtraces into a structured form.
 
