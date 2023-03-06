@@ -1,15 +1,15 @@
 require "spec"
 require "../src/backtracer"
 
-def with_configuration(shared = true)
+def with_configuration(shared = true, &)
   yield shared ? Backtracer.configuration : Backtracer::Configuration.new
 end
 
-def with_backtrace(backtrace, **options)
+def with_backtrace(backtrace, **options, &)
   yield Backtracer::Backtrace::Parser.parse(backtrace, **options)
 end
 
-def with_frame(method, path = nil, lineno = nil, column = nil, **options)
+def with_frame(method, path = nil, lineno = nil, column = nil, **options, &)
   line = String.build do |io|
     if path
       io << path
@@ -28,7 +28,8 @@ def with_foo_frame(
   path = "#{__DIR__}/foo.cr",
   lineno = 1,
   column = 7,
-  **options
+  **options,
+  &
 )
   with_frame(method, path, lineno, column, **options) do |frame|
     yield frame

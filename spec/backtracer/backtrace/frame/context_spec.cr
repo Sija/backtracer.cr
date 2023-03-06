@@ -1,6 +1,6 @@
 require "../../../spec_helper"
 
-def with_foo_context
+def with_foo_context(&)
   yield Backtracer::Backtrace::Frame::Context.new(
     lineno: 10,
     pre: %w[foo bar baz],

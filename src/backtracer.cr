@@ -1,7 +1,7 @@
 module Backtracer
   class_getter(configuration) { Configuration.new }
 
-  def self.configure : Nil
+  def self.configure(&) : Nil
     yield configuration
   end
 
