@@ -15,7 +15,7 @@ module Backtracer
     # The column number of this frame.
     getter column : Int32?
 
-    protected getter(configuration) { Backtracer.configuration }
+    protected getter(configuration : Configuration) { Backtracer.configuration }
 
     def initialize(@method, @path = nil, @lineno = nil, @column = nil, *,
                    @configuration = nil)
