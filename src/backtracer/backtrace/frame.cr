@@ -18,7 +18,7 @@ module Backtracer
     protected getter(configuration) { Backtracer.configuration }
 
     def initialize(@method, @path = nil, @lineno = nil, @column = nil, *,
-                   @configuration = nil)
+                   @configuration : Backtracer::Configuration? = nil)
     end
 
     def_equals_and_hash @method, @path, @lineno, @column
