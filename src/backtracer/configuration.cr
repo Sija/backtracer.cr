@@ -79,10 +79,10 @@ module Backtracer
     # Array of procs used for filtering backtrace lines before parsing.
     # Each filter is expected to return a string, which is then passed
     # onto the next filter, or ignored althoghether if `nil` is returned.
-    getter(line_filters) {
+    getter(line_filters) do
       [
         ->(line : String) { line unless line.matches?(IGNORED_LINES_PATTERN) },
       ] of String -> String?
-    }
+    end
   end
 end
