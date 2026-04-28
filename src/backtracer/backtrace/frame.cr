@@ -7,7 +7,7 @@ module Backtracer
     getter method : String
 
     # The file name of this frame (such as `app/models/user.cr`).
-    getter path : String?
+    getter path : Path?
 
     # The line number of this frame.
     getter lineno : Int32?
@@ -17,8 +17,9 @@ module Backtracer
 
     protected getter(configuration : Configuration) { Backtracer.configuration }
 
-    def initialize(@method, @path = nil, @lineno = nil, @column = nil, *,
+    def initialize(@method, path : String | Path? = nil, @lineno = nil, @column = nil, *,
                    @configuration = nil)
+      @path = path.is_a?(String) ? Path[path] : path
     end
 
     def_equals_and_hash @method, @path, @lineno, @column
@@ -45,7 +46,7 @@ module Backtracer
     # See `Configuration#src_path`
     def under_src_path? : Bool
       return false unless src_path = configuration.src_path
-      !!path.try(&.starts_with?(src_path))
+      !!path.try(&.to_s.starts_with?(src_path))
     end
 
     # Returns:
@@ -57,12 +58,12 @@ module Backtracer
     # NOTE: returned path is not required to be `under_src_path?` - see point no. 1
     #
     # See `Configuration#src_path`
-    def relative_path : String?
+    def relative_path : Path?
       return unless path = @path
-      return path unless path.starts_with?('/')
+      return path unless path.absolute?
       return unless under_src_path?
-      if prefix = configuration.src_path
-        path[prefix.chomp(File::SEPARATOR).size + 1..]
+      if src_path = configuration.src_path
+        path.relative_to?(src_path)
       end
     end
 
@@ -73,11 +74,11 @@ module Backtracer
     # - `nil` otherwise
     #
     # See `Configuration#src_path`
-    def absolute_path : String?
+    def absolute_path : Path?
       return unless path = @path
-      return path if path.starts_with?('/')
-      if prefix = configuration.src_path
-        File.join(prefix, path)
+      return path if path.absolute?
+      if src_path = configuration.src_path
+        Path[src_path, path]
       end
     end
 
@@ -86,7 +87,7 @@ module Backtracer
     # See `Configuration#modules_path_pattern`
     def shard_name : String?
       relative_path
-        .try(&.match(configuration.modules_path_pattern))
+        .try(&.to_posix.to_s.match(configuration.modules_path_pattern))
         .try(&.["name"])
     end
 
@@ -95,7 +96,7 @@ module Backtracer
     #
     # See `Configuration#app_dirs_pattern`
     def in_app? : Bool
-      !!(relative_path.try(&.matches?(configuration.app_dirs_pattern)))
+      !!(relative_path.try(&.to_posix.to_s.matches?(configuration.app_dirs_pattern)))
     end
 
     # Returns `Context` record consisting of 3 elements - an array of context lines
