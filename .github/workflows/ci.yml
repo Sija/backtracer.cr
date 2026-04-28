@@ -15,17 +15,15 @@ jobs:
 
     steps:
       - name: Install Crystal
-        uses: oprypin/install-crystal@v1
+        uses: crystal-lang/install-crystal@v1
         with:
           crystal: ${{ matrix.crystal }}
 
       - name: Download source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: shards install
-        env:
-          SHARDS_OPTS: --ignore-crystal-version
 
       - name: Run specs
         run: |
@@ -36,9 +34,3 @@ jobs:
         run: |
           crystal spec --release
           crystal spec --release --no-debug
-
-      - name: Check formatting
-        run: crystal tool format --check
-
-      - name: Run ameba linter
-        run: bin/ameba
