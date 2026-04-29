@@ -8,8 +8,8 @@ describe Backtracer::Backtrace::Frame do
   end
 
   it "#to_s" do
-    with_foo_frame(path: "#{__DIR__}/foo.cr") do |frame|
-      frame.to_s.should eq "`foo_bar?` at #{__DIR__}/foo.cr:1:7"
+    with_foo_frame(path: Path[__DIR__, "foo.cr"]) do |frame|
+      frame.to_s.should eq "`foo_bar?` at #{Path[__DIR__, "foo.cr"]}:1:7"
     end
   end
 
