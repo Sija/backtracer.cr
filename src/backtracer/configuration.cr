@@ -14,7 +14,7 @@ module Backtracer
       # - `lib/foo/src/foo/bar.cr:50:7 in '*Foo::Bar#_baz:Foo::Bam'`
       # - `lib/foo/src/foo/bar.cr:29:9 in '*Foo::Bar::bar_by_id<String>:Foo::Bam'`
       # - `/usr/local/Cellar/crystal-lang/0.24.1/src/fiber.cr:114:3 in '*Fiber#run:(IO::FileDescriptor | Nil)'`
-      /^(?<file>[^:]+)(?:\:(?<line>\d+)(?:\:(?<col>\d+))?)? in '\*?(?<method>.*?)'(?: at #{ADDR_FORMAT})?$/,
+      /^(?<file>.+?)(?:\:(?<line>\d+)(?:\:(?<col>\d+))?)? in '\*?(?<method>.*?)'(?: at #{ADDR_FORMAT})?$/,
 
       # Crystal proc
       #
@@ -23,7 +23,7 @@ module Backtracer
       # - `~procProc(Nil)@/usr/local/Cellar/crystal-lang/0.24.1/src/http/server.cr:148 at 0x102cee376`
       # - `~procProc(HTTP::Server::Context, String)@lib/kemal/src/kemal/route.cr:11 at 0x102ce57db`
       # - `~procProc(HTTP::Server::Context, (File::PReader | HTTP::ChunkedContent | HTTP::Server::Response | HTTP::Server::Response::Output | HTTP::UnknownLengthContent | HTTP::WebSocket::Protocol::StreamIO | IO::ARGF | IO::Delimited | IO::FileDescriptor | IO::Hexdump | IO::Memory | IO::MultiWriter | IO::Sized | Int32 | OpenSSL::SSL::Socket | String::Builder | Zip::ChecksumReader | Zip::ChecksumWriter | Zlib::Deflate | Zlib::Inflate | Nil))@src/foo/bar/baz.cr:420`
-      /^(?<method>~[^@]+)@(?<file>[^:]+)(?:\:(?<line>\d+))(?: at #{ADDR_FORMAT})?$/,
+      /^(?<method>~[^@]+)@(?<file>.+?)(?:\:(?<line>\d+))(?: at #{ADDR_FORMAT})?$/,
 
       # Crystal crash
       #
