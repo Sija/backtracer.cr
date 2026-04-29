@@ -46,7 +46,7 @@ module Backtracer
     # See `Configuration#src_path`
     def under_src_path? : Bool
       return false unless src_path = configuration.src_path
-      !!path.try(&.to_s.starts_with?(src_path))
+      !!path.try(&.to_s.starts_with?(src_path.to_s))
     end
 
     # Returns:
