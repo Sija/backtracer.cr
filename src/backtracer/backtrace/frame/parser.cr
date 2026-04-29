@@ -10,7 +10,7 @@ module Backtracer
     #
     # Returns parsed `Backtrace::Frame` on success or `nil` otherwise.
     def parse?(line : String, **options) : Backtrace::Frame?
-      return unless Configuration::LINE_PATTERNS.any? &.match(line)
+      return unless Configuration::LINE_PATTERNS.any?(&.match(line))
 
       method = $~["method"]?.presence
       file = $~["file"]?.presence

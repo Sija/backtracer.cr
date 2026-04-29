@@ -69,7 +69,7 @@ module Backtracer
     # See `Frame#in_app?`
     property app_dirs_pattern = /^src\//
 
-    # Path pattern matching directories to be recognized as your app modules.
+    # POSIX path pattern matching directories to be recognized as your app modules.
     # Defaults to standard Shards setup (`lib/shard-name/...`).
     #
     # See `Frame#shard_name`

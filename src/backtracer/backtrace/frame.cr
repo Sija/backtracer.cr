@@ -15,7 +15,9 @@ module Backtracer
     # The column number of this frame.
     getter column : Int32?
 
-    protected getter(configuration : Configuration) { Backtracer.configuration }
+    protected getter(configuration : Configuration) do
+      Backtracer.configuration
+    end
 
     def initialize(@method, path : String | Path? = nil, @lineno = nil, @column = nil, *,
                    @configuration = nil)
@@ -45,23 +47,24 @@ module Backtracer
     #
     # See `Configuration#src_path`
     def under_src_path? : Bool
+      return false unless path = @path
       return false unless src_path = configuration.src_path
-      !!path.try(&.to_s.starts_with?(src_path.to_s))
+
+      path.to_s.starts_with?(src_path.to_s)
     end
 
     # Returns:
     #
-    # - `path` as is, unless it's absolute - i.e. starts with `/`
-    # - `path` relative to `configuration.src_path` when `under_src_path?` is `true`
+    # - `path`, unless it's absolute
+    # - `path` relative to `configuration.src_path`, when `path` is contained within
     # - `nil` otherwise
-    #
-    # NOTE: returned path is not required to be `under_src_path?` - see point no. 1
     #
     # See `Configuration#src_path`
     def relative_path : Path?
       return unless path = @path
       return path unless path.absolute?
       return unless under_src_path?
+
       if src_path = configuration.src_path
         path.relative_to?(src_path)
       end
@@ -69,7 +72,7 @@ module Backtracer
 
     # Returns:
     #
-    # - `path` as is, if it's absolute - i.e. starts with `/`
+    # - `path` as is, if it's absolute
     # - `path` appended to `configuration.src_path`
     # - `nil` otherwise
     #
@@ -77,6 +80,7 @@ module Backtracer
     def absolute_path : Path?
       return unless path = @path
       return path if path.absolute?
+
       if src_path = configuration.src_path
         Path[src_path, path]
       end
@@ -96,7 +100,8 @@ module Backtracer
     #
     # See `Configuration#app_dirs_pattern`
     def in_app? : Bool
-      !!(relative_path.try(&.to_posix.to_s.matches?(configuration.app_dirs_pattern)))
+      !!(relative_path
+        .try(&.to_posix.to_s.matches?(configuration.app_dirs_pattern)))
     end
 
     # Returns `Context` record consisting of 3 elements - an array of context lines
