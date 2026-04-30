@@ -56,11 +56,7 @@ module Backtracer
     # Path considered as "root" of your project.
     #
     # See `Frame#under_src_path?`
-    property src_path : Path? = begin
-      Path[Dir.current]
-    rescue File::NotFoundError
-      nil
-    end
+    property src_path : Path? = {{ Process::INITIAL_PWD }}.try { |path| Path[path] }
 
     # Directories to be recognized as part of your app. e.g. if you
     # have an `engines` dir at the root of your project, you may want
