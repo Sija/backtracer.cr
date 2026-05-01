@@ -19,6 +19,9 @@ module Backtracer
       end
 
       lines = backtrace.compact_map do |line|
+        line = line.strip
+        line = line.lchop("from ") # handle backtraces from STDOUT
+
         filters.reduce(line) do |nested_line, filter|
           filter.call(nested_line) || break
         end

@@ -8,6 +8,19 @@ describe Backtracer::Backtrace::Parser do
       end
     end
 
+    it "handles STDOUT-formatted input" do
+      begin
+        raise "Oh, no!"
+      rescue ex
+        lines = ex.inspect_with_backtrace.lines
+        lines.shift # remove the exception message
+
+        with_backtrace(lines) do |backtrace|
+          backtrace.frames.none?(&.method.includes?("from ")).should be_true
+        end
+      end
+    end
+
     it "handles `Exception#backtrace` as an input" do
       begin
         raise "Oh, no!"
