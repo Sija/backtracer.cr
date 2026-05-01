@@ -1,12 +1,36 @@
 module Backtracer
   # An object representation of a stack frame.
   struct Backtrace::Frame
+    protected def self.os_specific_path(path : String) : Path
+      case
+      when path[0]? == '/'
+        Path.posix(path)
+      when path[0]? == '\\',
+           path[2]? == '\\' && path[1]? == ':' && path[0]?.try(&.ascii_letter?)
+        Path.windows(path)
+      else
+        posix_separators, windows_separators =
+          path.count('/'), path.count('\\')
+
+        case
+        when posix_separators > windows_separators
+          Path.posix(path)
+        when windows_separators > posix_separators
+          Path.windows(path)
+        else
+          Path[path]
+        end
+      end
+    end
+
     @context_cache = {} of Int32 => Context
 
     # The method of this frame (such as `User.find`).
     getter method : String
 
-    # The file name of this frame (such as `app/models/user.cr`).
+    # The file path of this frame (such as `app/models/user.cr`).
+    #
+    # NOTE: Path kind is detetermined using heuristics.
     getter path : Path?
 
     # The line number of this frame.
@@ -21,7 +45,7 @@ module Backtracer
 
     def initialize(@method, path : String | Path? = nil, @lineno = nil, @column = nil, *,
                    @configuration = nil)
-      @path = path.is_a?(String) ? Path[path] : path
+      @path = path.is_a?(String) ? Frame.os_specific_path(path) : path
     end
 
     def_equals_and_hash @method, @path, @lineno, @column

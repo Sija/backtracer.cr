@@ -1,5 +1,47 @@
 require "../../../spec_helper"
 
+private BACKTRACE_LINE_EXAMPLES = {
+  "[0x489d6c] *Crystal::main<Int32, Pointer(Pointer(UInt8))>:Int32 +156": {
+    method: "Crystal::main<Int32, Pointer(Pointer(UInt8))>:Int32",
+  },
+  "/usr/lib/libc.so.6 in '??'": {
+    path:   Path.posix("/usr/lib/libc.so.6"),
+    method: "??",
+  },
+  "/usr/lib/crystal/crystal/main.cr:115:7 in 'main'": {
+    path:   Path.posix("/usr/lib/crystal/crystal/main.cr"),
+    method: "main",
+    lineno: 115,
+    column: 7,
+  },
+  "/usr/local/Cellar/crystal-lang/0.24.1/src/fiber.cr:114:3 in '*Fiber#run:(IO::FileDescriptor | Nil)'": {
+    path:   Path.posix("/usr/local/Cellar/crystal-lang/0.24.1/src/fiber.cr"),
+    method: "Fiber#run:(IO::FileDescriptor | Nil)",
+    lineno: 114,
+    column: 3,
+  },
+  "../../../../../crystal/src/crystal/main.cr:105:5 in 'main'": {
+    path:          Path.posix("../../../../../crystal/src/crystal/main.cr"),
+    relative_path: Path.posix("../../../../../crystal/src/crystal/main.cr"),
+    method:        "main",
+    lineno:        105,
+    column:        5,
+  },
+  "Crystal::CodeGenVisitor#visit<Crystal::Assign>:(Bool | Nil)": {
+    method: "Crystal::CodeGenVisitor#visit<Crystal::Assign>:(Bool | Nil)",
+  },
+  %q(WINDOWS\SYSTEM32\ntdll.dll +314513 in 'RtlUserThreadStart'): {
+    path:          Path.windows(%q(WINDOWS\SYSTEM32\ntdll.dll)),
+    relative_path: Path.windows(%q(WINDOWS\SYSTEM32\ntdll.dll)),
+    method:        "RtlUserThreadStart",
+  },
+  %q(D:\a\crystal\crystal\src\compiler\crystal.cr:11 in '__crystal_main'): {
+    path:   Path.windows(%q(D:\a\crystal\crystal\src\compiler\crystal.cr)),
+    method: "__crystal_main",
+    lineno: 11,
+  },
+}
+
 describe Backtracer::Backtrace::Frame::Parser do
   describe ".parse" do
     it "fails to parse an empty string" do
@@ -19,6 +61,20 @@ describe Backtracer::Backtrace::Frame::Parser do
           frame.under_src_path?.should be_false
           frame.shard_name.should be_nil
           frame.in_app?.should be_false
+        end
+      end
+    end
+
+    it "parses valid backtrace line format examples" do
+      BACKTRACE_LINE_EXAMPLES.each do |backtrace_line, expected|
+        with_frame(backtrace_line) do |frame|
+          frame.lineno.should eq(expected[:lineno]?)
+          frame.column.should eq(expected[:column]?)
+          frame.method.should eq(expected[:method]?)
+          frame.path.should eq(expected[:path]?)
+          frame.relative_path.should eq(expected[:relative_path]?)
+          frame.shard_name.should eq(expected[:shard_name]?)
+          frame.in_app?.should eq(expected[:in_app]? || false)
         end
       end
     end
