@@ -45,7 +45,12 @@ module Backtracer
 
     def initialize(@method, path : String | Path? = nil, @lineno = nil, @column = nil, *,
                    @configuration = nil)
-      @path = path.is_a?(String) ? Frame.os_specific_path(path) : path
+      if path
+        path = Frame.os_specific_path(path) if path.is_a?(String)
+        path = path.normalize
+
+        @path = path
+      end
     end
 
     def_equals_and_hash @method, @path, @lineno, @column
